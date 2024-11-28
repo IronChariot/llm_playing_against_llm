@@ -2,7 +2,7 @@ import argparse
 import sys
 from config import Config
 from game_manager import GameManager
-from models import OllamaModel, AnthropicModel
+from models import Model, OllamaModel, AnthropicModel, OpenAIModel
 from games import CoinFlipGame
 from system_prompt import SystemPrompt
 from utilities import setup_logging
@@ -17,7 +17,7 @@ def parse_arguments():
     parser.add_argument("--rounds", type=int, default=1, help="Number of rounds to play (default: 1)")
     return parser.parse_args()
 
-def test_system_prompt(model: OllamaModel, logger):
+def test_system_prompt(model: Model, logger):
     logger.info("Testing system prompt understanding...")
     response = model.test_system_prompt()
     logger.info(f"Model's understanding of the game rules:\n{response}")
@@ -45,11 +45,15 @@ def main():
     try:
         if args.model1 in ["opus", "sonnet", "haiku"]:
             model1 = AnthropicModel(args.model1, system_prompt=system_prompt1, logger=model1_logger)
+        elif args.model1 in ["gpt-4o", "gpt-4o-mini", "gpt-4", "gpt-3.5"]:
+            model1 = OpenAIModel(args.model1, system_prompt=system_prompt1, logger=model1_logger)
         else:
             model1 = OllamaModel(args.model1, system_prompt=system_prompt1, logger=model1_logger)
             
         if args.model2 in ["opus", "sonnet", "haiku"]:
             model2 = AnthropicModel(args.model2, system_prompt=system_prompt2, logger=model2_logger)
+        elif args.model2 in ["gpt-4o", "gpt-4o-mini", "gpt-4", "gpt-3.5"]:
+            model2 = OpenAIModel(args.model2, system_prompt=system_prompt2, logger=model2_logger) 
         else:
             model2 = OllamaModel(args.model2, system_prompt=system_prompt2, logger=model2_logger)
     except ValueError as e:
